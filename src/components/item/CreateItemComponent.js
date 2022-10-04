@@ -55,7 +55,7 @@ class CreateItemComponent extends Component {
 
     saveOrUpdateItem = (e) => {
         e.preventDefault();
-        let hasError = this.validateWeapon();
+        let hasError = this.validateItem();
         if (hasError) {
             alert("Form has Errors.");
             return;
@@ -118,7 +118,6 @@ class CreateItemComponent extends Component {
     }
 
     handleDeleteStat = (index, event) => {
-        console.log("DELETE");
         this.setState(prevState => ({statFields: prevState.statFields.filter((__, i) => i !== index)     }));
     }
 
@@ -126,7 +125,7 @@ class CreateItemComponent extends Component {
         this.props.navigate('/items');
     }
 
-    validateWeapon() {
+    validateItem() {
         let weaponDmgMin = this.state.weapondmgmin;
         let weaponDmgMax = this.state.weapondmgmax;
         let name = this.state.name;
@@ -143,16 +142,19 @@ class CreateItemComponent extends Component {
             hasErrors = true;
         }
         if (weaponDmgMin > 20000) {
-            errors['minDmgErrors'] = "Min Weapon Damage Cannot Exceed the 20000 Limit."
+            errors['weaponDmgErrors'] = "Min Weapon Damage Cannot Exceed the 20000 Limit."
             hasErrors = true;
         }
         if (weaponDmgMax > 20000) {
-            errors['maxDmgErrors'] = "Max Weapon Damage Cannot Exceed the 20000 Limit."
+            errors['weaponDmgErrors'] = "Max Weapon Damage Cannot Exceed the 20000 Limit."
             hasErrors = true;
         }
-        if (weaponDmgMin < 0 || weaponDmgMax < 0) {
-            errors['minDmgErrors'] = 'Damage Cannot be Less than Zero.';
+        if (weaponDmgMin < 0) {
+            errors['weaponDmgErrors'] = 'Min Damage Cannot be Less than zero.';
             hasErrors = true;
+        }
+        if (weaponDmgMax < 0) {
+            errors['weaponDmgErrors'] = 'Max Damage Cannot be less than zero.'
         }
         this.setState({errors: errors});
         return hasErrors;
@@ -182,7 +184,6 @@ class CreateItemComponent extends Component {
         }
     }
 
-
     render() {
         const { statOptions } = this.state;
         return (
@@ -198,7 +199,7 @@ class CreateItemComponent extends Component {
                                 <div className = "card-body">
                                     <form>
                                         <fieldset>
-                                            <div className = "form-group weapon-form-item">
+                                            <div className = "form-group item-form">
                                                 <label className='item-label'> Name: </label>
                                                 <input placeholder="Name" name="name" className="form-control" 
                                                     value={this.state.name} onChange={this.changeNameHandler}/>
@@ -206,35 +207,48 @@ class CreateItemComponent extends Component {
                                             </div>
                                         </fieldset>
                                         <CreateWeaponComponent itemtype={this.props.itemtype} minDmgHandler={this.changeMinDamageHandler.bind(this)} maxDmgHandler={this.changeMaxDamageHandler.bind(this)}></CreateWeaponComponent>
-                                        <div className = "form-group weapon-form-item">
-                                            {this.state.statFields.map((stat, index) => {                                         
-                                                return (
-                                                <div key={index}>
-                                                <Select 
-                                                    defaultValue={this.getSelectedOption(stat)}
-                                                    onChange={event => this.handleStatChange(index, event)} 
-                                                    options={statOptions}
-                                                    className="basic-single"
-                                                    classNamePrefix="select"
-                                                />
+                                        <span className='error' style={{ color: "red" }}>{this.state.errors['weaponDmgErrors']}</span>       
+                                        <fieldset>
+                                            <div className = "form-group item-form">
+                                                {this.state.statFields.map((stat, index) => {                                       
+                                                    return (
+                                                    <div key={index}>
+                                                        <div className="form-group">
+                                                            <label htmlFor="statType">Stat Type</label>
+                                                            <Select 
+                                                                    defaultValue={this.getSelectedOption(stat)}
+                                                                    onChange={event => this.handleStatChange(index, event)} 
+                                                                    options={statOptions}
+                                                                    className="basic-single"
+                                                                    classNamePrefix="select"
+                                                                />
+                                                        </div>
+                                                        <div className='form-group'>
+                                                            <label htmlFor="statValue">Value</label>
+                                                            <input
+                                                                name='statValue'
+                                                                placeholder='Value'
+                                                                type="number"
+                                                                value={stat.statValue}
+                                                                className="form-control"
+                                                                onChange={event => this.handleStatValueChange(index, event)}
+                                                            />                                                  
+                                                        </div>
+                                                        <div className='form-group del-btn-container'>
+                                                            <button  type="button" name="deleteStatBtn" id="deleteStatBtn" onClick={event => this.handleDeleteStat(index, event)} className='btn btn-primary'><span className='bi bi-trash'></span></button>
+                                                        </div>
+                                                    
+                                                    </div>
+                                                    )
+                                                })}
+                                            </div>
+                                        </fieldset>
 
-                                                <input
-                                                    name='statValue'
-                                                    placeholder='Value'
-                                                    type="number"
-                                                    value={stat.statValue}
-                                                    onChange={event => this.handleStatValueChange(index, event)}
-                                                />
-                                                <button type="button" name="deleteStatBtn" id="deleteStatBtn" onClick={event => this.handleDeleteStat(index, event)} className='btn btn-primary'><span className='bi bi-trash'></span></button>
-                                                </div>
-                                                )
-                                            })}
-                                        </div>
-                                        <div className = "form-group weapon-form-item">
+                                        <div className = "form-group item-form">
                                             <button type="button" onClick={this.addStatHandler.bind(this)} className="btn btn-primary">Add {this.capitalizeFirst(this.props.itemtype)} Stat</button>
                                         </div>
                                         <fieldset>
-                                            <div className="form-group weapon-form-submit">
+                                            <div className="form-group item-form-submit">
                                                 <button className="btn btn-success item-submit-button" onClick={this.saveOrUpdateItem.bind(this)}>Save</button>
                                                 <button className="btn btn-danger item-submit-button" onClick={this.cancel.bind(this)} style={{marginLeft: "10px"}}>Cancel</button>
                                             </div>

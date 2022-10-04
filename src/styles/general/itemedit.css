@@ -1,8 +1,8 @@
-.weapon-form-item {
+.item-form {
     padding: 6px;
 }
 
-.weapon-form-submit {
+.item-form-submit {
     padding: 1%;
     padding-top: 2%;
 }
@@ -18,4 +18,8 @@
 .item-submit-button {
     height: 20%;
     width: 20%;
+}
+
+.del-btn-container {
+    padding-top: 1%;
 }
