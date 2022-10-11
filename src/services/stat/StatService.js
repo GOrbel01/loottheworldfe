@@ -1,7 +1,8 @@
 import axios from 'axios';
+import { properties } from '../../properties/properties.js'
 
-const STAT_URL_BASE = "http://localhost:8080/api/v1/stat";
-const STAT_URL_BASE_B = "http://localhost:8080/api/v1/stats";
+const STAT_URL_BASE = properties.baseUrl + properties.statPath;
+const STAT_URL_BASE_B = properties.baseUrl + properties.statPath + properties.pathPlural;
 
 class StatService {
 
@@ -21,7 +22,7 @@ class StatService {
         return axios.get(STAT_URL_BASE + '/' + statId);
     }
 
-    updateStat(stat, statId){
+    updateStat(statId, stat){
         return axios.put(STAT_URL_BASE + '/' + statId, stat);
     }
 

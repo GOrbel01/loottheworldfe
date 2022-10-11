@@ -9,7 +9,6 @@ class CreateWeaponComponent extends Component {
             itemtype: 'weapon',
         };
 
-
     }
 
     render() {
@@ -19,12 +18,12 @@ class CreateWeaponComponent extends Component {
                 <div className = "form-group item-form">
                     <label htmlFor="minDmg" className='item-label'> Minimum Damage: </label>
                     <input type="number" placeholder="" name="weapondmgmin" className="form-control" 
-                         onChange={this.props.minDmgHandler}/>   
+                        value={this.props.weapondmgmin} onChange={this.props.minDmgHandler}/>   
                 </div>
                 <div className = "form-group item-form">
                     <label htmlFor="maxDmg" className='item-label'> Maximum Damage: </label>
                     <input type="number" placeholder="" name="weapondmgmax" className="form-control" 
-                        onChange={this.props.maxDmgHandler} onSubmit={this.props.weaponSubmitHandler}/>                                 
+                       value={this.props.weapondmgmax} onChange={this.props.maxDmgHandler} onSubmit={this.props.weaponSubmitHandler}/>                                 
                 </div>
             </fieldset>
             )

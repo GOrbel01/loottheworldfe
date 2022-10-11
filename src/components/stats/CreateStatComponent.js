@@ -6,23 +6,20 @@ class CreateStatComponent extends Component {
     constructor(props) {
         super(props)
         this.state = {
-            // step 2
-            id: props.params.id,
+            id: this.props.params.id,
             statName: ''
         }
         this.changeStatNameHandler = this.changeStatNameHandler.bind(this);
     }
 
-    // step 3
     componentDidMount(){
-
-        // step 4
         if(this.state.id === '_add'){
             return
         }else{
             StatService.getStatById(this.state.id).then( (res) =>{
                 let stat = res.data;
                 this.setState({
+                    statId: res.data.id,
                     statName: stat.statName,
                 });
             });
@@ -35,11 +32,11 @@ class CreateStatComponent extends Component {
 
         if(this.state.id === '_add'){
             StatService.createStat(stat).then(res =>{
-                this.props.navigate('/items');
+                this.props.navigate('/stats');
             });
         }else{
             StatService.updateStat(stat, this.state.id).then( res => {
-                this.props.navigate('/items');
+                this.props.navigate('/stats');
             });
         }
     }
@@ -50,7 +47,7 @@ class CreateStatComponent extends Component {
 
 
     cancel(){
-        this.props.navigate('/items');
+        this.props.navigate('/stats');
     }
 
     getTitle(){
@@ -67,19 +64,21 @@ class CreateStatComponent extends Component {
                 <br></br>
                    <div className = "container">
                         <div className = "row">
-                            <div className = "card col-md-6 offset-md-3 offset-md-3">
+                            <div className = "card col-md-6 offset-md-3 offset-md-3 item-form-container">
                                 {
                                     this.getTitle()
                                 }
                                 <div className = "card-body">
                                     <form>
-                                        <div className = "form-group weapon-form-item">
+                                        <div className = "form-group item-form">
                                             <label> Name: </label>
                                             <input placeholder="Name" name="statName" className="form-control" 
                                                 value={this.state.statName} onChange={this.changeStatNameHandler}/>
                                         </div>
-                                        <button className="btn btn-success" onClick={this.saveOrUpdateStat}>Save</button>
-                                        <button className="btn btn-danger" onClick={this.cancel.bind(this)} style={{marginLeft: "10px"}}>Cancel</button>
+                                        <div className="item-form-submit">
+                                            <button className="btn btn-success" onClick={this.saveOrUpdateStat}>Save</button>
+                                            <button className="btn btn-danger" onClick={this.cancel.bind(this)} style={{marginLeft: "10px"}}>Cancel</button>
+                                        </div>
                                     </form>
                                 </div>
                             </div>

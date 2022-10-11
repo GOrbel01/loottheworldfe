@@ -12,10 +12,11 @@ class CreateItemComponent extends Component {
 
         this.state = {
             name: '',
+            armor: 0,
             id: this.props.params.id,
             itemtype: this.props.itemtype,
-            weapondmgmin: '',
-            weapondmgmax: '',
+            weapondmgmin: 0,
+            weapondmgmax: 0,
             service: this.props.service,
             errors: {},
             itemstats: [],
@@ -23,12 +24,15 @@ class CreateItemComponent extends Component {
             statOptions: [],           
         };
 
+        let initialState = [];
+
         this.changeNameHandler = this.changeNameHandler.bind(this);
         this.changeMinDamageHandler = this.changeMinDamageHandler.bind(this);
         this.changeMaxDamageHandler = this.changeMaxDamageHandler.bind(this);
         this.addStatHandler = this.addStatHandler.bind(this);
         this.handleStatChange = this.handleStatChange.bind(this);
         this.handleDeleteStat = this.handleDeleteStat.bind(this);
+        this.changeArmorHandler = this.changeArmorHandler.bind(this);
     }
 
     componentDidMount(){
@@ -43,10 +47,14 @@ class CreateItemComponent extends Component {
         }else{
             this.state.service.getItemById(this.state.id).then( (res) =>{
                 let item = res.data;
+                this.initialState = res.data;
                 this.setState({
+                    id: res.data.id,
                     name: item.name,
-                    weapondmgmin: item.minDamage,
-                    weapondmgmax : item.maxDamage,
+                    itemType: item.itemType,
+                    armor: item.armor,
+                    weapondmgmin: item.weapondmgmin,
+                    weapondmgmax : item.weapondmgmax,
                     statFields: item.itemstats
                 });
             });
@@ -61,9 +69,12 @@ class CreateItemComponent extends Component {
             return;
         }
 
-        let iStats = [...this.state.statFields];
+        let iStats = [];
+        if (this.state.statFields) {
+            iStats = [...this.state.statFields];
+        }
 
-        let item = {name: this.state.name, weapondmgmin: this.state.weapondmgmin, weapondmgmax: this.state.weapondmgmax, itemType: this.state.itemtype,
+        let item = {id: this.state.id, name: this.state.name, armor: this.state.armor, weapondmgmin: this.state.weapondmgmin, weapondmgmax: this.state.weapondmgmax, itemType: this.state.itemtype,
             itemstats: iStats
         
         };
@@ -72,8 +83,9 @@ class CreateItemComponent extends Component {
             this.state.service.createItem(item).then(res =>{
                 this.props.navigate('/items');
             });
-        }else{
-            this.state.service.updateItem(item, this.state.id).then( res => {
+        }else{       
+            let diffs = this.processDiffs();
+            this.state.service.updateItem(this.state.id, diffs).then( res => {
                 this.props.navigate('/items');
             });
         }
@@ -84,19 +96,29 @@ class CreateItemComponent extends Component {
     }
 
     changeMinDamageHandler = (event) => {
-
         this.setState({weapondmgmin: event.target.value});
     }
 
     changeMaxDamageHandler= (event) => {
-
         this.setState({weapondmgmax: event.target.value});
     }
 
+    changeArmorHandler = (event) => {
+        this.setState({armor: parseInt(event.target.value)});
+    }
+
     addStatHandler = () => {   
-        if (this.state.statOptions.length > 0) {   
-            let curIndex = this.state.statFields.length;
-            let newField = {statId : this.state.statOptions[0].value, statValue: '', statIndex: curIndex};
+        if (this.state.statOptions.length > 0) {
+            let curIndex = 0;
+            if (this.state.statFields != null) {
+                curIndex = this.state.statFields.length;
+            } else {
+                if (this.state.statFields == null) {
+                    this.setState({statFields: []});
+                }
+            }
+
+            let newField = {statId : 0, statValue: '', statIndex: curIndex};
             this.setState(prevState => ({
                 statFields: [...prevState.statFields, newField]
               }))
@@ -184,6 +206,42 @@ class CreateItemComponent extends Component {
         }
     }
 
+    processDiffs() {
+        let results = {};
+        let state = this.state;
+        let keys = Object.keys(this.initialState);
+        keys.map((key) => {
+            let keyAlt = key;
+            if (key === 'itemstats') {
+                keyAlt = 'statFields';
+            }
+            if (this.hasDiff(this.initialState[key], state[keyAlt])) {
+                results[key] = this.buildDiff(this.initialState[key], state[keyAlt]);
+            }
+        });
+        return results;
+    }
+
+    hasDiff(initialValue, newValue) {
+        if (initialValue && newValue) {
+            let result =  initialValue !== newValue;
+            return result;
+        }
+        if (initialValue && !newValue) {
+            return false;
+        }
+        if (!initialValue && newValue) {
+            return true;
+        }
+    }
+
+    buildDiff(before, after) {
+        return {
+            "before": before,
+            "after":after
+         }
+    }
+
     render() {
         const { statOptions } = this.state;
         return (
@@ -192,7 +250,7 @@ class CreateItemComponent extends Component {
                 <br></br>
                    <div className = "container">
                         <div className = "row">
-                            <div className = "card col-md-6 offset-md-3 offset-md-3 weapon-form-container">
+                            <div className = "card col-md-6 offset-md-3 offset-md-3 item-form-container">
                                 {
                                     <label className='item-label'>{this.getTitle()}</label>
                                 }
@@ -205,12 +263,18 @@ class CreateItemComponent extends Component {
                                                     value={this.state.name} onChange={this.changeNameHandler}/>
                                                     <span className='error' style={{ color: "red" }}>{this.state.errors['name']}</span>      
                                             </div>
-                                        </fieldset>
-                                        <CreateWeaponComponent itemtype={this.props.itemtype} minDmgHandler={this.changeMinDamageHandler.bind(this)} maxDmgHandler={this.changeMaxDamageHandler.bind(this)}></CreateWeaponComponent>
+                                            <div className = "form-group item-form">
+                                                <label className='item-label'> Armor: </label>
+                                                <input type="number" placeholder="armor" name="armor" className="form-control" 
+                                                    value={this.state.armor} onChange={this.changeArmorHandler}/>
+                                                    <span className='error' style={{ color: "red" }}>{this.state.errors['armor']}</span>      
+                                            </div>
+                                        </fieldset>                                   
+                                        <CreateWeaponComponent weapondmgmin={this.state.weapondmgmin} weapondmgmax={this.state.weapondmgmax} itemtype={this.props.itemtype} minDmgHandler={this.changeMinDamageHandler.bind(this)} maxDmgHandler={this.changeMaxDamageHandler.bind(this)}></CreateWeaponComponent>
                                         <span className='error' style={{ color: "red" }}>{this.state.errors['weaponDmgErrors']}</span>       
                                         <fieldset>
                                             <div className = "form-group item-form">
-                                                {this.state.statFields.map((stat, index) => {                                       
+                                                {this.state.statFields && this.state.statFields.map((stat, index) => {                                       
                                                     return (
                                                     <div key={index}>
                                                         <div className="form-group">

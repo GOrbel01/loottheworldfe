@@ -11,7 +11,7 @@
     padding-bottom: 1%;
 }
 
-.weapon-form-container {
+.item-form-container {
     padding-top: 1%;
 }
 
@@ -22,4 +22,12 @@
 
 .del-btn-container {
     padding-top: 1%;
+}
+
+.edit-div {
+    width: 20%;
+}
+
+.edit-div > * {
+    margin: 1%;
 }

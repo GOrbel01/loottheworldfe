@@ -1,12 +1,15 @@
 import axios from 'axios';
+import { properties } from '../../properties/properties.js'
 
-const ITEM_URL_BASE = "http://localhost:8080/api/v1/item";
-const ITEM_URL_BASE_2 = "http://localhost:8080/api/v1/items";
+const ITEM_URL_BASE = properties.baseUrl + properties.itemPath;
+const ITEM_URL_BASE_B = properties.baseUrl + properties.itemPath + properties.pathPlural;
 
 class ItemService {
 
     getItems(){
-        return axios.get(ITEM_URL_BASE_2);
+        return axios.get(ITEM_URL_BASE_B, {
+            withCredentials: true
+        });
     }
 
     createItem(item) {

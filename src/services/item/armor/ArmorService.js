@@ -1,12 +1,13 @@
 import axios from 'axios';
+import { properties } from '../../../properties/properties.js'
 
-const ITEM_URL_BASE = "http://localhost:8080/api/v1/armor";
-const ITEM_URL_BASE_2 = "http://localhost:8080/api/v1/armors";
+const ITEM_URL_BASE = properties.baseUrl + properties.armorPath;
+const ITEM_URL_BASE_B = properties.baseUrl + properties.armorPath + properties.pathPlural;
 
 class ArmorService {
 
     getItems(){
-        return axios.get(ITEM_URL_BASE_2);
+        return axios.get(ITEM_URL_BASE_B);
     }
 
     createItem(item) {
@@ -15,6 +16,10 @@ class ArmorService {
 
     getItemById(id){
         return axios.get(ITEM_URL_BASE + '/' + id);
+    }
+
+    updateItem(id, item) {
+        return axios.put(ITEM_URL_BASE + '/' + id, item);
     }
 }
 
