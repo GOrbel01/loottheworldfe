@@ -4,5 +4,7 @@ export const properties = {
     statPath: "stat",
     weaponPath: "weapon",
     armorPath: "armor",
-    pathPlural: "s"
+    rarityPath: "loot-rarity",
+    pathPlural: "s",
+    altPathPlural: 'ies'
 }

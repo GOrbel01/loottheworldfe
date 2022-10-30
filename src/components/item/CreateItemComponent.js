@@ -5,6 +5,7 @@ import { withParamsAndNavigate } from "../getParamsAndNavigate";
 import CreateWeaponComponent from './weapon/CreateWeaponComponent';
 import StatService from '../../services/stat/StatService';
 import Select from 'react-select';
+import { processDiffs } from '../../functions/global/Utils'
 
 class CreateItemComponent extends Component {
     constructor(props) {
@@ -13,6 +14,7 @@ class CreateItemComponent extends Component {
         this.state = {
             name: '',
             armor: 0,
+            userid: '',
             id: this.props.params.id,
             itemtype: this.props.itemtype,
             weapondmgmin: 0,
@@ -24,7 +26,7 @@ class CreateItemComponent extends Component {
             statOptions: [],           
         };
 
-        let initialState = [];
+        this.initialState = {};
 
         this.changeNameHandler = this.changeNameHandler.bind(this);
         this.changeMinDamageHandler = this.changeMinDamageHandler.bind(this);
@@ -74,17 +76,18 @@ class CreateItemComponent extends Component {
             iStats = [...this.state.statFields];
         }
 
-        let item = {id: this.state.id, name: this.state.name, armor: this.state.armor, weapondmgmin: this.state.weapondmgmin, weapondmgmax: this.state.weapondmgmax, itemType: this.state.itemtype,
+        let item = {id: this.state.id, userid: this.props.authData.user, name: this.state.name, armor: this.state.armor, weapondmgmin: this.state.weapondmgmin, weapondmgmax: this.state.weapondmgmax, itemType: this.state.itemtype,
             itemstats: iStats
         
         };
 
         if(this.state.id === '_add'){
+            item.id = null;
             this.state.service.createItem(item).then(res =>{
                 this.props.navigate('/items');
             });
         }else{       
-            let diffs = this.processDiffs();
+            let diffs = processDiffs(this.initialState, this.state);
             this.state.service.updateItem(this.state.id, diffs).then( res => {
                 this.props.navigate('/items');
             });
@@ -204,42 +207,6 @@ class CreateItemComponent extends Component {
                 }
             } 
         }
-    }
-
-    processDiffs() {
-        let results = {};
-        let state = this.state;
-        let keys = Object.keys(this.initialState);
-        keys.map((key) => {
-            let keyAlt = key;
-            if (key === 'itemstats') {
-                keyAlt = 'statFields';
-            }
-            if (this.hasDiff(this.initialState[key], state[keyAlt])) {
-                results[key] = this.buildDiff(this.initialState[key], state[keyAlt]);
-            }
-        });
-        return results;
-    }
-
-    hasDiff(initialValue, newValue) {
-        if (initialValue && newValue) {
-            let result =  initialValue !== newValue;
-            return result;
-        }
-        if (initialValue && !newValue) {
-            return false;
-        }
-        if (!initialValue && newValue) {
-            return true;
-        }
-    }
-
-    buildDiff(before, after) {
-        return {
-            "before": before,
-            "after":after
-         }
     }
 
     render() {

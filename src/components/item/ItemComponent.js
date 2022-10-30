@@ -71,6 +71,7 @@ class ItemComponent extends Component {
                                     <th> Name</th>
                                     <th> Type</th>
                                     <th> Stats</th>
+                                    <th></th>
                                     <th> Actions</th>
                                 </tr>
                             </thead>

@@ -1,17 +1,7 @@
-import React, { Component } from 'react'
 import { withParamsAndNavigate } from "../getParamsAndNavigate";
 import '../../styles/general/home.css'
 
-class HomePage extends Component {
-    constructor(props) {
-        super(props)
-
-        this.state = {
-                 
-        }
-    }
-
-    render() {
+function HomePage() {
         return (
             <div className="container px-4 px-lg-5">
             <div className="row gx-4 gx-lg-5 align-items-center my-5">
@@ -79,7 +69,6 @@ class HomePage extends Component {
             <h1 className="font-weight-light" style={{"textAlign": 'center', padding: 10+"px"}}>What are you Waiting for? Get started!</h1>
         </div>
         )
-    }
 }
 
 export default withParamsAndNavigate(HomePage)

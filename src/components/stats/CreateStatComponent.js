@@ -7,7 +7,8 @@ class CreateStatComponent extends Component {
         super(props)
         this.state = {
             id: this.props.params.id,
-            statName: ''
+            userid: '',
+            statname: ''
         }
         this.changeStatNameHandler = this.changeStatNameHandler.bind(this);
     }
@@ -20,7 +21,7 @@ class CreateStatComponent extends Component {
                 let stat = res.data;
                 this.setState({
                     statId: res.data.id,
-                    statName: stat.statName,
+                    statname: stat.statName,
                 });
             });
         }        
@@ -28,8 +29,7 @@ class CreateStatComponent extends Component {
 
     saveOrUpdateStat = (e) => {
         e.preventDefault();
-        let stat = {statName: this.state.statName};
-
+        let stat = {statname: this.state.statname, userid: this.props.authData.user.id};
         if(this.state.id === '_add'){
             StatService.createStat(stat).then(res =>{
                 this.props.navigate('/stats');
@@ -42,7 +42,7 @@ class CreateStatComponent extends Component {
     }
     
     changeStatNameHandler= (event) => {
-        this.setState({statName: event.target.value});
+        this.setState({statname: event.target.value});
     }
 
 
@@ -72,8 +72,8 @@ class CreateStatComponent extends Component {
                                     <form>
                                         <div className = "form-group item-form">
                                             <label> Name: </label>
-                                            <input placeholder="Name" name="statName" className="form-control" 
-                                                value={this.state.statName} onChange={this.changeStatNameHandler}/>
+                                            <input placeholder="Name" name="statname" className="form-control" 
+                                                value={this.state.statname} onChange={this.changeStatNameHandler}/>
                                         </div>
                                         <div className="item-form-submit">
                                             <button className="btn btn-success" onClick={this.saveOrUpdateStat}>Save</button>
